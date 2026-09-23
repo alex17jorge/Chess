@@ -1,0 +1,41 @@
+.board {
+    display: grid;
+    grid-template-columns: repeat(8, 64px);
+    width: 512px;
+    margin: 0 auto;
+}
+
+.square {
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    font-size: 48px; 
+}
+
+.light {
+  background: #f0d9b5;
+}
+
+.dark {
+  background: #b58863;
+}
+
+.white {
+  color: white;
+  text-shadow: 0 0 2px black;
+}
+
+.black {
+  color: black;
+}
+
+button {
+    border: none;
+}
+
+
+.square.selected {
+    outline: 4px solid yellow;
+    outline-offset: -4px;
+}
