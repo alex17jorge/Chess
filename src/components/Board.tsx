@@ -1,15 +1,8 @@
 import { useState } from "react";
 import "../styles/board.css";
 
-type Color = 'white' | 'black';
-type PieceType = 'pawn' | 'knight' | 'bishop' | 'rook' | 'queen' | 'king';
-type Piece = { type: PieceType; color: Color };
-type Square = Piece | null;
-type Board = Square[][];
-type Position = {
-    row: number
-    column: number
-}
+import type { Color, PieceType, Piece, Square, Board, Position } from "../game/type"
+import getLegalMoves from "../game/getLegalMoves";
 
 const pieceSymbols: Record<PieceType, string> = {
   pawn: '♟',
@@ -34,13 +27,20 @@ const initialBoard : Board = [
 function Board(){
     const [board, setBoard] = useState(initialBoard)
     const [selected, setSelected] = useState<Position | null>(null)
+    const [legalMoves, setLegalMoves] = useState<Position[]>([])
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
         
         if (clickedPiece !== null){
             setSelected({row, column})
+            setLegalMoves(getLegalMoves(board, row, column))
+            return
+            
         }
+        setSelected(null)
+        setLegalMoves([])
+
     }
 
     
@@ -51,10 +51,11 @@ function Board(){
                 row.map((square, columnIndex) => {
                     const isDark = (rowIndex + columnIndex) % 2 === 1
                     const isSelected = selected?.row === rowIndex && selected?.column === columnIndex
+                    const isLegalMove = legalMoves.some((move) => move.row === rowIndex && move.column === columnIndex)
                     return (
                         <button 
                             type='button'
-                            className={`square ${isDark ? 'dark' : 'light'} ${isSelected ? 'selected' : ''}`} 
+                            className={`square ${isDark ? 'dark' : 'light'} ${isSelected ? 'selected' : ''} ${isLegalMove ? 'legal-move' : ''}`} 
                             key={`${rowIndex}-${columnIndex}`}
                             onClick={()=> handleSquareClick(rowIndex, columnIndex)}
                         >   
