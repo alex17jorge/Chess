@@ -9,7 +9,7 @@ function getPawnMoves(board: Board, row: number, column:number, color: Color){
         direction = -1
         startingRow = 6
     } else {
-        direction = +1
+        direction = 1
         startingRow = 1
     }
 
@@ -28,6 +28,21 @@ function getPawnMoves(board: Board, row: number, column:number, color: Color){
             moves.push({row: twoRows, column})
         }
     }
+
+    // capture left
+    const captureLeft = column - 1
+    if (nextRow >= 0 && nextRow < 8 && captureLeft >= 0 && 
+        board[nextRow][captureLeft] !== null && board[nextRow][captureLeft]!.color !== color){
+            moves.push({row: nextRow, column: captureLeft})
+    }
+
+    // capture right
+    const captureRight = column + 1
+    if (nextRow >= 0 && nextRow < 8 && captureRight < 8 && 
+        board[nextRow][captureRight] !== null && board[nextRow][captureRight]!.color !== color){
+            moves.push({row: nextRow, column: captureRight})
+    }
+
 
     return moves
 
