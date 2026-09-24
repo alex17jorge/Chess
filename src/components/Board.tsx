@@ -3,6 +3,7 @@ import "../styles/board.css";
 
 import type { Color, PieceType, Piece, Square, Board, Position } from "../game/type"
 import getLegalMoves from "../game/getLegalMoves";
+import movePiece from "../game/movePiece";
 
 const pieceSymbols: Record<PieceType, string> = {
   pawn: '♟',
@@ -28,19 +29,40 @@ function Board(){
     const [board, setBoard] = useState(initialBoard)
     const [selected, setSelected] = useState<Position | null>(null)
     const [legalMoves, setLegalMoves] = useState<Position[]>([])
+    const [turn, setTurn] = useState<Color>('white')
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
         
-        if (clickedPiece !== null){
-            setSelected({row, column})
-            setLegalMoves(getLegalMoves(board, row, column))
-            return
-            
+   
+        if(selected){
+            const isLegalMove = legalMoves.some(
+                (move) => move.row === row && move.column === column
+            )
+
+            if (isLegalMove){
+                setBoard(movePiece(board, selected, {row, column}))
+                setTurn((currentTurn) => currentTurn === 'white' ? 'black' : 'white')
+                setSelected(null)
+                setLegalMoves([])
+                return
+            }
         }
+
+        if (clickedPiece !== null){
+            if (clickedPiece.color !== turn){
+                return
+            }
+            
+            const moves = getLegalMoves(board, row, column)
+            setSelected({row, column})
+            setLegalMoves(moves)
+            console.log(moves)
+            return
+        }
+ 
         setSelected(null)
         setLegalMoves([])
-
     }
 
     
