@@ -3,6 +3,8 @@ import getPawnMoves from "./pieces/pawnMoves"
 import getKnightMoves from "./pieces/knightMoves"
 import getBishopMoves from "./pieces/bishopMoves"
 import getRookMoves from "./pieces/rookMoves"
+import getQueenMoves from "./pieces/queenMoves"
+import getKingMoves from "./pieces/kingMoves"
 
 function getLegalMoves(board: Board, row: number, column: number): Position[] {
     const piece = board[row][column]
@@ -23,6 +25,12 @@ function getLegalMoves(board: Board, row: number, column: number): Position[] {
 
         case 'rook':
             return getRookMoves(board, row, column, piece.color)
+        
+        case 'queen':
+            return getQueenMoves(board, row, column, piece.color)
+        
+        case 'king':
+            return getKingMoves(board, row, column, piece.color)
 
         default:
             return []
