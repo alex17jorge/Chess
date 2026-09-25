@@ -2,6 +2,7 @@ import type { Position, Board } from "./type"
 import getPawnMoves from "./pieces/pawnMoves"
 import getKnightMoves from "./pieces/knightMoves"
 import getBishopMoves from "./pieces/bishopMoves"
+import getRookMoves from "./pieces/rookMoves"
 
 function getLegalMoves(board: Board, row: number, column: number): Position[] {
     const piece = board[row][column]
@@ -19,6 +20,9 @@ function getLegalMoves(board: Board, row: number, column: number): Position[] {
 
         case 'bishop':
             return getBishopMoves(board, row, column, piece.color)
+
+        case 'rook':
+            return getRookMoves(board, row, column, piece.color)
 
         default:
             return []
