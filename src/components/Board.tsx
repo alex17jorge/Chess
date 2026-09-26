@@ -4,6 +4,7 @@ import "../styles/board.css";
 import type { Color, PieceType, Piece, Square, Board, Position } from "../game/type"
 import getLegalMoves from "../game/getLegalMoves";
 import movePiece from "../game/movePiece";
+import isKingInCheck from "../game/isKingInCheck";
 
 const pieceSymbols: Record<PieceType, string> = {
   pawn: '♟',
@@ -30,6 +31,9 @@ function Board(){
     const [selected, setSelected] = useState<Position | null>(null)
     const [legalMoves, setLegalMoves] = useState<Position[]>([])
     const [turn, setTurn] = useState<Color>('white')
+
+    const currentPlayer = turn === 'white' ? 'White' : 'Black'
+    const currentPlayerInCheck = isKingInCheck(board, turn)
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
@@ -68,27 +72,32 @@ function Board(){
     
 
     return (
-        <div className="board">
-            {board.map((row, rowIndex) => 
-                row.map((square, columnIndex) => {
-                    const isDark = (rowIndex + columnIndex) % 2 === 1
-                    const isSelected = selected?.row === rowIndex && selected?.column === columnIndex
-                    const isLegalMove = legalMoves.some((move) => move.row === rowIndex && move.column === columnIndex)
-                    return (
-                        <button 
-                            type='button'
-                            className={`square ${isDark ? 'dark' : 'light'} ${isSelected ? 'selected' : ''} ${isLegalMove ? 'legal-move' : ''}`} 
-                            key={`${rowIndex}-${columnIndex}`}
-                            onClick={()=> handleSquareClick(rowIndex, columnIndex)}
-                        >   
-                            {square && (
-                                <span className={square.color}>{pieceSymbols[square.type]}</span>
-                            )}
-                        </button>
-                    )
-                }),
-            )}
-        </div>
+        <>
+            <h2>{currentPlayer}'s turn</h2>
+            <h2>{currentPlayerInCheck && ' -- in check'}</h2>
+            <div className="board">
+                {board.map((row, rowIndex) => 
+                    row.map((square, columnIndex) => {
+                        const isDark = (rowIndex + columnIndex) % 2 === 1
+                        const isSelected = selected?.row === rowIndex && selected?.column === columnIndex
+                        const isLegalMove = legalMoves.some((move) => move.row === rowIndex && move.column === columnIndex)
+                        return (
+                            <button 
+                                type='button'
+                                className={`square ${isDark ? 'dark' : 'light'} ${isSelected ? 'selected' : ''} ${isLegalMove ? 'legal-move' : ''}`} 
+                                key={`${rowIndex}-${columnIndex}`}
+                                onClick={()=> handleSquareClick(rowIndex, columnIndex)}
+                            >   
+                                {square && (
+                                    <span className={square.color}>{pieceSymbols[square.type]}</span>
+                                )}
+                            </button>
+                        )
+                    }),
+                )}
+            </div>
+        </>
+        
     )
 }
 

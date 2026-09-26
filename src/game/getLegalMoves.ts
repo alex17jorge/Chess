@@ -5,6 +5,8 @@ import getBishopMoves from "./pieces/bishopMoves"
 import getRookMoves from "./pieces/rookMoves"
 import getQueenMoves from "./pieces/queenMoves"
 import getKingMoves from "./pieces/kingMoves"
+import movePiece from "./movePiece"
+import isKingInCheck from "./isKingInCheck"
 
 function getLegalMoves(board: Board, row: number, column: number): Position[] {
     const piece = board[row][column]
@@ -13,30 +15,44 @@ function getLegalMoves(board: Board, row: number, column: number): Position[] {
         return []
     }
 
+    let possibleMoves: Position[] = []
+
     switch (piece.type) {
         case 'pawn':
-            return getPawnMoves(board, row, column, piece.color)
+            possibleMoves = getPawnMoves(board, row, column, piece.color)
+            break
         
         case 'knight':
-            return getKnightMoves(board, row, column, piece.color)
+            possibleMoves = getKnightMoves(board, row, column, piece.color)
+            break
 
         case 'bishop':
-            return getBishopMoves(board, row, column, piece.color)
+            possibleMoves = getBishopMoves(board, row, column, piece.color)
+            break
 
         case 'rook':
-            return getRookMoves(board, row, column, piece.color)
+            possibleMoves = getRookMoves(board, row, column, piece.color)
+            break
         
         case 'queen':
-            return getQueenMoves(board, row, column, piece.color)
+            possibleMoves = getQueenMoves(board, row, column, piece.color)
+            break
         
         case 'king':
-            return getKingMoves(board, row, column, piece.color)
+            possibleMoves = getKingMoves(board, row, column, piece.color)
+            break
 
         default:
             return []
+            
     }
 
+    const currentPosition = {row, column}
 
+    return possibleMoves.filter((move)=> {
+        const simulateBoard = movePiece(board, currentPosition, move)
+        return !isKingInCheck(simulateBoard, piece.color)
+    })
 }
 
 export default getLegalMoves
