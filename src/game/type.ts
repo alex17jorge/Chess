@@ -14,3 +14,9 @@ export type CastlingRights = {
   blackKingside: boolean
   blackQueenside: boolean
 }
+
+export type LastMove = {
+    piece: Piece
+    from: Position
+    to: Position
+} | null

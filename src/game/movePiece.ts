@@ -1,5 +1,12 @@
-import type {Board, Position, PieceType} from "./type"
-function movePiece(board: Board, currentPosition: Position, nextPosition: Position, promotionType? : PieceType): Board {
+import type {Board, Position, PieceType, LastMove} from "./type"
+
+function movePiece(
+    board: Board,
+    currentPosition: Position,
+    nextPosition: Position,
+    lastMove: LastMove = null,
+    promotionType?: PieceType,
+): Board {
     
     const piece = board[currentPosition.row][currentPosition.column]
 
@@ -9,7 +16,26 @@ function movePiece(board: Board, currentPosition: Position, nextPosition: Positi
 
     const nextBoard = board.map((row) => [...row])
 
-    const isCastling = piece.type === 'king' && currentPosition.column === 4 && Math.abs(nextPosition.column - currentPosition.column) === 2
+    const isEnPassant = 
+        piece.type === 'pawn' &&
+        board[nextPosition.row][nextPosition.column] === null &&
+        currentPosition.column !== nextPosition.column &&
+        lastMove?.piece.type === 'pawn' &&
+        lastMove.piece.color !== piece.color &&
+        Math.abs(lastMove.to.row - lastMove.from.row) === 2 &&
+        lastMove.to.row === currentPosition.row &&
+        lastMove.to.column === nextPosition.column &&
+        board[currentPosition.row][nextPosition.column]?.type === 'pawn'
+
+    if (isEnPassant){
+        nextBoard[currentPosition.row][nextPosition.column] = null
+    }
+
+    const isCastling =
+        piece.type === 'king' &&
+        currentPosition.row === nextPosition.row &&
+        currentPosition.column === 4 &&
+        (nextPosition.column === 2 || nextPosition.column === 6)
 
     if (isCastling) {
         const rookFromColumn = nextPosition.column > currentPosition.column ? 7 : 0

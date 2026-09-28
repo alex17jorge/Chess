@@ -1,5 +1,12 @@
-import type { Color, Board, Position } from "../type"
-function getPawnMoves(board: Board, row: number, column:number, color: Color){
+import type { Color, Board, Position, LastMove } from "../type"
+
+function getPawnMoves(
+    board: Board,
+    row: number,
+    column: number,
+    color: Color,
+    lastMove: LastMove = null
+){
     const moves: Position[] = []
 
     let direction: number;
@@ -43,6 +50,19 @@ function getPawnMoves(board: Board, row: number, column:number, color: Color){
             moves.push({row: nextRow, column: captureRight})
     }
 
+    //en pessant
+    if (lastMove && lastMove.piece.type === 'pawn'){
+        const movedTwoSquares = Math.abs(lastMove.to.row - lastMove.from.row) === 2
+
+        const pawnIsAdjacent = lastMove.to.row === row && Math.abs(lastMove.to.column - column) === 1
+
+        const adjacentPiece = board[row][lastMove.to.column]
+
+        if (movedTwoSquares && pawnIsAdjacent && adjacentPiece?.type === 'pawn' && adjacentPiece.color !== color){
+            moves.push({row: row+direction, column: lastMove.to.column})
+        }
+
+    }
 
     return moves
 

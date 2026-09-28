@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "../styles/board.css";
 
-import { type Color, type PieceType, type Piece, type Square, type Board, type Position, CastlingRights } from "../game/type"
+import { type Color, type PieceType, type Board, type Position, type CastlingRights, LastMove } from "../game/type"
 import getLegalMoves from "../game/getLegalMoves";
 import movePiece from "../game/movePiece";
 import isKingInCheck from "../game/isKingInCheck";
@@ -39,6 +39,8 @@ function Board(){
         blackKingside: true,
         blackQueenside: true
     })
+    const [lastMove, setLastMove] = useState<LastMove>(null)
+
 
     const currentPlayer = turn === 'white' ? 'White' : 'Black'
     const status = getGameStatus(board, turn, castlingRights)
@@ -53,13 +55,21 @@ function Board(){
             )
 
             if (isLegalMove){
-                setBoard(movePiece(board, selected, {row, column}))
+                const destination = {row, column}
+                const movingPiece = board[selected.row][selected.column]
+
+                if (!movingPiece) {
+                    return
+                }
+
+                setBoard(movePiece(board, selected, destination, lastMove))
+                setLastMove({piece: movingPiece, from: selected, to: destination})
                 setCastlingRights((currentRights) =>
                     updateCastlingRights(
                         currentRights,
                         board,
                         selected,
-                        {row, column},
+                        destination,
                     )
                 )
                 setTurn((currentTurn) => currentTurn === 'white' ? 'black' : 'white')
@@ -74,7 +84,7 @@ function Board(){
                 return
             }
             
-            const moves = getLegalMoves(board, row, column, castlingRights)
+            const moves = getLegalMoves(board, row, column, castlingRights, lastMove)
             setSelected({row, column})
             setLegalMoves(moves)
             console.log(moves)
