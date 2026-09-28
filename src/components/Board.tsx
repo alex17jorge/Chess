@@ -5,6 +5,7 @@ import type { Color, PieceType, Piece, Square, Board, Position } from "../game/t
 import getLegalMoves from "../game/getLegalMoves";
 import movePiece from "../game/movePiece";
 import isKingInCheck from "../game/isKingInCheck";
+import getGameStatus from "../game/gameStatus";
 
 const pieceSymbols: Record<PieceType, string> = {
   pawn: '♟',
@@ -34,6 +35,7 @@ function Board(){
 
     const currentPlayer = turn === 'white' ? 'White' : 'Black'
     const currentPlayerInCheck = isKingInCheck(board, turn)
+    const status = getGameStatus(board, turn)
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
@@ -74,7 +76,7 @@ function Board(){
     return (
         <>
             <h2>{currentPlayer}'s turn</h2>
-            <h2>{currentPlayerInCheck && ' -- in check'}</h2>
+            <h2>Game Status: {status}</h2>
             <div className="board">
                 {board.map((row, rowIndex) => 
                     row.map((square, columnIndex) => {
