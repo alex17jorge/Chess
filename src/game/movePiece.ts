@@ -1,5 +1,5 @@
-import type {Board, Position} from "./type"
-function movePiece(board: Board, currentPosition: Position, nextPosition: Position): Board {
+import type {Board, Position, PieceType} from "./type"
+function movePiece(board: Board, currentPosition: Position, nextPosition: Position, promotionType? : PieceType): Board {
     
     const piece = board[currentPosition.row][currentPosition.column]
 
@@ -7,8 +7,16 @@ function movePiece(board: Board, currentPosition: Position, nextPosition: Positi
         return board
     }
 
+    
     const nextBoard = board.map((row) => [...row])
-    nextBoard[nextPosition.row][nextPosition.column] = piece
+
+    const isPromotion = piece.type === 'pawn' && (nextPosition.row === 0 || nextPosition.row === 7)
+
+    const movedPiece = isPromotion ? {type: promotionType ?? 'queen', color: piece.color} : piece
+
+
+
+    nextBoard[nextPosition.row][nextPosition.column] = movedPiece
     nextBoard[currentPosition.row][currentPosition.column] = null
 
     return nextBoard
