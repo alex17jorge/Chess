@@ -1,11 +1,11 @@
 import getLegalMoves from "./getLegalMoves"
 import isKingInCheck from "./isKingInCheck"
-import type { Color, Board } from "./type"
+import type { Color, Board, CastlingRights } from "./type"
 
 type GameStatus = | 'ongoing' | 'check' | 'checkmate' | 'stalemate'
 
 
-function getGameStatus(board: Board, color: Color): GameStatus {
+function getGameStatus(board: Board, color: Color, castlingRights: CastlingRights): GameStatus {
     const inCheck = isKingInCheck(board, color)
     let hasLegalMove = false
 
@@ -17,7 +17,7 @@ function getGameStatus(board: Board, color: Color): GameStatus {
                 continue
             }
 
-            const legalMoves = getLegalMoves(board, row, column)
+            const legalMoves = getLegalMoves(board, row, column, castlingRights )
 
             if (legalMoves.length > 0){
                 hasLegalMove = true

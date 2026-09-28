@@ -1,4 +1,4 @@
-import type { Position, Board } from "./type"
+import type { Position, Board, CastlingRights } from "./type"
 import getPawnMoves from "./pieces/pawnMoves"
 import getKnightMoves from "./pieces/knightMoves"
 import getBishopMoves from "./pieces/bishopMoves"
@@ -7,8 +7,9 @@ import getQueenMoves from "./pieces/queenMoves"
 import getKingMoves from "./pieces/kingMoves"
 import movePiece from "./movePiece"
 import isKingInCheck from "./isKingInCheck"
+import getCastlingMoves from "./castling"
 
-function getLegalMoves(board: Board, row: number, column: number): Position[] {
+function getLegalMoves(board: Board, row: number, column: number, castlingRights: CastlingRights): Position[] {
     const piece = board[row][column]
 
     if (!piece){
@@ -40,6 +41,7 @@ function getLegalMoves(board: Board, row: number, column: number): Position[] {
         
         case 'king':
             possibleMoves = getKingMoves(board, row, column, piece.color)
+            possibleMoves.push(...getCastlingMoves(board, piece.color, castlingRights))
             break
 
         default:

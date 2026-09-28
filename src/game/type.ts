@@ -7,3 +7,10 @@ export type Position = {
     row: number
     column: number
 }
+
+export type CastlingRights = {
+  whiteKingside: boolean
+  whiteQueenside: boolean
+  blackKingside: boolean
+  blackQueenside: boolean
+}

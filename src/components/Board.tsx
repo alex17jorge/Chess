@@ -1,10 +1,11 @@
 import { useState } from "react";
 import "../styles/board.css";
 
-import type { Color, PieceType, Piece, Square, Board, Position } from "../game/type"
+import { type Color, type PieceType, type Piece, type Square, type Board, type Position, CastlingRights } from "../game/type"
 import getLegalMoves from "../game/getLegalMoves";
 import movePiece from "../game/movePiece";
 import isKingInCheck from "../game/isKingInCheck";
+import updateCastlingRights from "../game/updateCastlingRights";
 import getGameStatus from "../game/gameStatus";
 
 const pieceSymbols: Record<PieceType, string> = {
@@ -32,10 +33,15 @@ function Board(){
     const [selected, setSelected] = useState<Position | null>(null)
     const [legalMoves, setLegalMoves] = useState<Position[]>([])
     const [turn, setTurn] = useState<Color>('white')
+    const [castlingRights, setCastlingRights] = useState<CastlingRights>({
+        whiteKingside: true,
+        whiteQueenside: true,
+        blackKingside: true,
+        blackQueenside: true
+    })
 
     const currentPlayer = turn === 'white' ? 'White' : 'Black'
-    const currentPlayerInCheck = isKingInCheck(board, turn)
-    const status = getGameStatus(board, turn)
+    const status = getGameStatus(board, turn, castlingRights)
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
@@ -48,6 +54,14 @@ function Board(){
 
             if (isLegalMove){
                 setBoard(movePiece(board, selected, {row, column}))
+                setCastlingRights((currentRights) =>
+                    updateCastlingRights(
+                        currentRights,
+                        board,
+                        selected,
+                        {row, column},
+                    )
+                )
                 setTurn((currentTurn) => currentTurn === 'white' ? 'black' : 'white')
                 setSelected(null)
                 setLegalMoves([])
@@ -60,7 +74,7 @@ function Board(){
                 return
             }
             
-            const moves = getLegalMoves(board, row, column)
+            const moves = getLegalMoves(board, row, column, castlingRights)
             setSelected({row, column})
             setLegalMoves(moves)
             console.log(moves)
