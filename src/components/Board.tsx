@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "../styles/board.css";
 
 import { type Color, type PieceType, type Board, type Position, type CastlingRights, LastMove } from "../game/type"
@@ -43,7 +43,9 @@ function Board(){
 
 
     const currentPlayer = turn === 'white' ? 'White' : 'Black'
-    const status = getGameStatus(board, turn, castlingRights)
+    const status = useMemo(
+        () => getGameStatus(board, turn, castlingRights, lastMove), [board, turn, castlingRights, lastMove])
+    
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
@@ -87,7 +89,6 @@ function Board(){
             const moves = getLegalMoves(board, row, column, castlingRights, lastMove)
             setSelected({row, column})
             setLegalMoves(moves)
-            console.log(moves)
             return
         }
  
