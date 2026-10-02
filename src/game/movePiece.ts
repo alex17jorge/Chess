@@ -24,8 +24,7 @@ function movePiece(
         lastMove.piece.color !== piece.color &&
         Math.abs(lastMove.to.row - lastMove.from.row) === 2 &&
         lastMove.to.row === currentPosition.row &&
-        lastMove.to.column === nextPosition.column &&
-        board[currentPosition.row][nextPosition.column]?.type === 'pawn'
+        lastMove.to.column === nextPosition.column
 
     if (isEnPassant){
         nextBoard[currentPosition.row][nextPosition.column] = null

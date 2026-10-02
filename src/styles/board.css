@@ -43,3 +43,16 @@ button {
 .square.legal-move {
   box-shadow: inset 0 0 0 5px rgba(40, 180, 80, 0.7);
 }
+
+.clocks {
+  display: flex;
+  justify-content: space-between;
+  width: 512px;
+  margin: 16px auto;
+  font-size: 24px;
+  font-family: monospace;
+}
+
+.inactive-clock {
+  opacity: 0.5;
+}

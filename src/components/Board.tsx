@@ -1,10 +1,9 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import "../styles/board.css";
 
 import { type Color, type PieceType, type Board, type Position, type CastlingRights, LastMove } from "../game/type"
 import getLegalMoves from "../game/getLegalMoves";
 import movePiece from "../game/movePiece";
-import isKingInCheck from "../game/isKingInCheck";
 import updateCastlingRights from "../game/updateCastlingRights";
 import getGameStatus from "../game/gameStatus";
 
@@ -46,11 +45,70 @@ function Board(){
     const status = useMemo(
         () => getGameStatus(board, turn, castlingRights, lastMove), [board, turn, castlingRights, lastMove])
     
+    const START_TIME = 5 * 60;
+
+    const [timeLeft, setTimeLeft] = useState({
+        white: START_TIME,
+        black: START_TIME
+    })
+    const [timerStarted, setTimerStarted] = useState(false)
+
+    useEffect(() => {
+        if (!timerStarted || status === 'checkmate' || status === 'stalemate'){
+            return;
+        }
+
+        const timer = window.setInterval(() => {
+            setTimeLeft((times) => {
+                const updated = {
+                    ...times,
+                    [turn]: Math.max(0, times[turn] - 1)
+                };
+                return updated
+            })
+
+        }, 1000)
+        return () => window.clearInterval(timer)
+    }, [timerStarted, turn, status])
+
+    useEffect(() => {
+        if (timerStarted && timeLeft[turn] === 0) {
+            setTimerStarted(false)
+        }
+    }, [timerStarted, timeLeft, turn])
+
+    function formatTime(seconds: number) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+
+        return `${String(minutes).padStart(2, "0")}:${String(
+            remainingSeconds
+        ).padStart(2, "0")}`;
+     }
+
+    function resetGame() {
+        setBoard(initialBoard)
+        setSelected(null)
+        setLegalMoves([])
+        setTurn('white')
+        setCastlingRights({
+            whiteKingside: true,
+            whiteQueenside: true,
+            blackKingside: true,
+            blackQueenside: true,
+        })
+        setLastMove(null)
+        setTimeLeft({ white: START_TIME, black: START_TIME })
+        setTimerStarted(false)
+    }
 
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
         
-   
+        if (!timerStarted || timeLeft[turn] === 0) {
+            return;
+        }
+    
         if(selected){
             const isLegalMove = legalMoves.some(
                 (move) => move.row === row && move.column === column
@@ -102,6 +160,27 @@ function Board(){
         <>
             <h2>{currentPlayer}'s turn</h2>
             <h2>Game Status: {status}</h2>
+            <div className="timer-controls">
+                <button
+                    type="button"
+                    onClick={() => setTimerStarted(true)}
+                    disabled={timerStarted}
+                >
+                    {timerStarted ? 'Timer running' : 'Start timer'}
+                </button>
+                <button type="button" onClick={resetGame}>
+                    Reset game
+                </button>
+            </div>
+            <div className="clocks">
+                <div className={turn === "black" ? "inactive-clock" : ""}>
+                    White: {formatTime(timeLeft.white)}
+                </div>
+
+                <div className={turn === "white" ? "inactive-clock" : ""}>
+                    Black: {formatTime(timeLeft.black)}
+                </div>
+            </div>
             <div className="board">
                 {board.map((row, rowIndex) => 
                     row.map((square, columnIndex) => {
