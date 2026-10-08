@@ -6,6 +6,8 @@ import getLegalMoves from "../game/getLegalMoves";
 import movePiece from "../game/movePiece";
 import updateCastlingRights from "../game/updateCastlingRights";
 import getGameStatus from "../game/gameStatus";
+import { initialBoard } from "../game/initialBoard"
+
 
 const pieceSymbols: Record<PieceType, string> = {
   pawn: '♟',
@@ -16,16 +18,6 @@ const pieceSymbols: Record<PieceType, string> = {
   king: '♚',
 }
 
-const initialBoard : Board = [
-    [{type: 'rook', color: 'black'}, {type: 'knight', color: 'black'}, {type: 'bishop', color: 'black'}, {type: 'queen', color: 'black'}, {type: 'king', color: 'black'}, {type: 'bishop', color: 'black'}, {type: 'knight', color: 'black'}, {type: 'rook', color: 'black'}],
-    [{type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}, {type: 'pawn', color: 'black'}],
-    [null, null, null, null, null, null, null, null,],
-    [null, null, null, null, null, null, null, null,],
-    [null, null, null, null, null, null, null, null,],
-    [null, null, null, null, null, null, null, null,],
-    [{type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}, {type: 'pawn', color: 'white'}],
-    [{type: 'rook', color: 'white'}, {type: 'knight', color: 'white'}, {type: 'bishop', color: 'white'}, {type: 'queen', color: 'white'}, {type: 'king', color: 'white'}, {type: 'bishop', color: 'white'}, {type: 'knight', color: 'white'}, {type: 'rook', color: 'white'}],
-]
 
 function Board(){
     const [board, setBoard] = useState(initialBoard)
@@ -42,6 +34,7 @@ function Board(){
 
 
     const currentPlayer = turn === 'white' ? 'White' : 'Black'
+
     const status = useMemo(
         () => getGameStatus(board, turn, castlingRights, lastMove), [board, turn, castlingRights, lastMove])
     
@@ -132,6 +125,7 @@ function Board(){
                         destination,
                     )
                 )
+                setTimerStarted(true)
                 setTurn((currentTurn) => currentTurn === 'white' ? 'black' : 'white')
                 setSelected(null)
                 setLegalMoves([])
@@ -158,7 +152,6 @@ function Board(){
 
     return (
         <>
-            <h2>{currentPlayer}'s turn</h2>
             <h2>Game Status: {status}</h2>
             <div className="timer-controls">
                 <button
@@ -173,11 +166,11 @@ function Board(){
                 </button>
             </div>
             <div className="clocks">
-                <div className={turn === "black" ? "inactive-clock" : ""}>
+                <div className={turn === "white" ? "active-clock" : "inactive-clock"}>
                     White: {formatTime(timeLeft.white)}
                 </div>
 
-                <div className={turn === "white" ? "inactive-clock" : ""}>
+                <div className={turn === "black" ? "active-clock" : "inactive-clock"}>
                     Black: {formatTime(timeLeft.black)}
                 </div>
             </div>
@@ -187,10 +180,11 @@ function Board(){
                         const isDark = (rowIndex + columnIndex) % 2 === 1
                         const isSelected = selected?.row === rowIndex && selected?.column === columnIndex
                         const isLegalMove = legalMoves.some((move) => move.row === rowIndex && move.column === columnIndex)
+                        const isCapture = isLegalMove && square !== null
                         return (
                             <button 
                                 type='button'
-                                className={`square ${isDark ? 'dark' : 'light'} ${isSelected ? 'selected' : ''} ${isLegalMove ? 'legal-move' : ''}`} 
+                                className={`square ${isDark ? 'dark' : 'light'} ${isSelected ? 'selected' : ''} ${isLegalMove ? 'legal-move' : ''} ${isCapture ? 'capture-move' : ''}`} 
                                 key={`${rowIndex}-${columnIndex}`}
                                 onClick={()=> handleSquareClick(rowIndex, columnIndex)}
                             >   

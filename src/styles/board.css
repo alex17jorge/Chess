@@ -11,6 +11,9 @@
     display: grid;
     place-items: center;
     font-size: 48px; 
+    position: relative;
+    padding: 0;
+    cursor: pointer;
 }
 
 .light {
@@ -41,7 +44,28 @@ button {
 }
 
 .square.legal-move {
-  box-shadow: inset 0 0 0 5px rgba(40, 180, 80, 0.7);
+  isolation: isolate;
+}
+
+.square.legal-move::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+/* Legal move to an empty square. */
+.square.legal-move:not(.capture-move)::after {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgb(40 180 80 / 70%);
+}
+
+/* Legal capture of an occupied square. */
+.square.legal-move.capture-move::after {
+  inset: 2px;
+  border: 5px solid rgb(40 180 80 / 70%);
+  border-radius: 50%;
 }
 
 .clocks {
@@ -55,4 +79,10 @@ button {
 
 .inactive-clock {
   opacity: 0.5;
+}
+
+.active-clock {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 7px;
 }
