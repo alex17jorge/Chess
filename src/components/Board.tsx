@@ -32,13 +32,10 @@ function Board(){
     })
     const [lastMove, setLastMove] = useState<LastMove>(null)
 
-
-    const currentPlayer = turn === 'white' ? 'White' : 'Black'
-
     const status = useMemo(
         () => getGameStatus(board, turn, castlingRights, lastMove), [board, turn, castlingRights, lastMove])
     
-    const START_TIME = 5 * 60;
+    const START_TIME = 10;
 
     const [timeLeft, setTimeLeft] = useState({
         white: START_TIME,
@@ -46,8 +43,10 @@ function Board(){
     })
     const [timerStarted, setTimerStarted] = useState(false)
 
+    const winner = timeLeft.white === 0 ? 'Black' : timeLeft.black === 0 ? 'White' : null
+
     useEffect(() => {
-        if (!timerStarted || status === 'checkmate' || status === 'stalemate'){
+        if (!timerStarted || winner || status === 'checkmate' || status === 'stalemate'){
             return;
         }
 
@@ -98,7 +97,7 @@ function Board(){
     function handleSquareClick(row: number, column: number) {
         const clickedPiece = board[row][column]
         
-        if (!timerStarted || timeLeft[turn] === 0) {
+        if (timeLeft[turn] === 0) {
             return;
         }
     
@@ -152,7 +151,9 @@ function Board(){
 
     return (
         <>
-            <h2>Game Status: {status}</h2>
+            <h2>
+                {winner ? `${winner} wins on time` : `Game Status: ${status}`}
+            </h2>
             <div className="timer-controls">
                 <button
                     type="button"
